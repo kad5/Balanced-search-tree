@@ -21,6 +21,32 @@ class Tree {
     if (value > node.data && node.right) return this.find(value, node.right);
     return "not in the tree";
   }
+
+  height(node) {
+    if (node === null) return -1;
+    const leftHeight = this.height(node.left);
+    const rightHeight = this.height(node.right);
+    return Math.max(leftHeight, rightHeight) + 1;
+  }
+
+  isBalanced(node = this.root) {
+    if (node === null) return true;
+    const leftHeight = this.height(node.left);
+    const rightHeight = this.height(node.right);
+    if (Math.abs(leftHeight - rightHeight) > 1) {
+      return false;
+    }
+    return this.isBalanced(node.left) && this.isBalanced(node.right);
+  }
+
+  depth(node, parent = this.root, depth = 0) {
+    if (node.data === parent.data) return depth;
+    if (node.data < parent.data)
+      return this.depth(node, parent.left, depth + 1);
+    if (node.data > parent.data)
+      return this.depth(node, parent.right, depth + 1);
+    return -1;
+  }
 }
 
 function buildTree(array) {
