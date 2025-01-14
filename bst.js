@@ -12,8 +12,31 @@ class Tree {
     this.root = buildTree(sorted);
   }
 
-  insert(value) {}
-  deleteItem(value) {}
+  insert(value) {
+    const newNode = createNode(value);
+    let node = this.root;
+    while (node) {
+      if (value === node.data) return;
+      if (value < node.data) {
+        if (!node.left) {
+          node.left = newNode;
+          break;
+        } else node = node.left;
+      }
+      if (value > node.data) {
+        if (!node.right) {
+          node.right = newNode;
+        } else node = node.right;
+      }
+    }
+    if (this.isBalanced() === false) this.rebalance();
+  }
+
+  deleteItem(value) {
+    if (this.isBalanced() === false) rebalance();
+  }
+
+  rebalance() {}
 
   find(value, node = this.root) {
     if (value === node.data) return node;
