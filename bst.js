@@ -33,7 +33,60 @@ class Tree {
   }
 
   deleteItem(value) {
-    if (this.isBalanced() === false) rebalance();
+    let parent = null;
+    let node = this.root;
+
+    while (node && node.data !== value) {
+      parent = node;
+      if (value < node.data) {
+        node = node.left;
+      } else {
+        node = node.right;
+      }
+    }
+    if (!node) return;
+    // leaf node
+    if (!node.left && !node.right) {
+      if (node === this.root) {
+        this.root = null;
+      } else {
+        parent.left === node ? (parent.left = null) : (parent.right = null);
+      }
+    }
+    // node with only left
+    if (node.left && !node.right) {
+      if (node === this.root) {
+        this.root = node.left;
+      } else {
+        parent.left === node
+          ? (parent.left = node.left)
+          : (parent.right = node.left);
+      }
+    }
+    // node with only right
+    if (!node.left && node.right) {
+      if (node === this.root) {
+        this.root = node.right;
+      } else {
+        parent.left === node
+          ? (parent.left = node.right)
+          : (parent.right = node.right);
+      }
+    }
+    // has both left and right
+    if (node.left && node.right) {
+      let tempParent = node;
+      let replacementNode = node.right;
+      while (replacementNode.left !== null) {
+        tempParent = replacementNode;
+        replacementNode = replacementNode.left;
+      }
+      node.data = replacementNode.data;
+      tempParent.left === replacementNode
+        ? (tempParent.left = replacementNode.right)
+        : (tempParent.right = replacementNode.right);
+    }
+    if (this.isBalanced() === false) this.rebalance();
   }
 
   rebalance() {}
@@ -42,7 +95,7 @@ class Tree {
     if (value === node.data) return node;
     if (value < node.data && node.left) return this.find(value, node.left);
     if (value > node.data && node.right) return this.find(value, node.right);
-    return "not in the tree";
+    return null;
   }
 
   height(node) {
