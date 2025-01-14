@@ -91,7 +91,9 @@ class Tree {
     if (this.isBalanced() === false) this.rebalance();
   }
   rebalance() {
-    //
+    const sorted = [];
+    this.inOrder((node) => sorted.push(node.data));
+    this.root = buildTree(sorted);
   }
   // example usage of the call backs myRoot.levelOrder(myRoot.depth.bind(myRoot))
   // or this next one
