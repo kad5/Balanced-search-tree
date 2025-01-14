@@ -5,11 +5,13 @@ function createNode(data) {
     right: null,
   };
 }
+
 class Tree {
   constructor(array) {
     const sorted = prepArray(array);
     this.root = buildTree(sorted);
   }
+
   insert(value) {
     const newNode = createNode(value);
     if (!this.root) {
@@ -22,18 +24,21 @@ class Tree {
       if (value < node.data) {
         if (!node.left) {
           node.left = newNode;
+          node = newNode;
           break;
         } else node = node.left;
       }
       if (value > node.data) {
         if (!node.right) {
           node.right = newNode;
+          node = newNode;
           break;
         } else node = node.right;
       }
     }
-    if (this.isBalanced() === false) this.rebalance();
+    //if (this.isBalanced() === false) this.rebalance();
   }
+
   deleteItem(value) {
     let parent = null;
     let node = this.root;
@@ -88,13 +93,26 @@ class Tree {
         ? (tempParent.left = replacementNode.right)
         : (tempParent.right = replacementNode.right);
     }
-    if (this.isBalanced() === false) this.rebalance();
+    //if (this.isBalanced() === false) this.rebalance();
   }
+
   rebalance() {
     const sorted = [];
     this.inOrder((node) => sorted.push(node.data));
     this.root = buildTree(sorted);
   }
+
+  isBalanced(node = this.root) {
+    if (node === null) return true;
+    const leftHeight = this.height(node.left);
+    const rightHeight = this.height(node.right);
+    if (Math.abs(leftHeight - rightHeight) > 1) {
+      return false;
+    }
+    return this.isBalanced(node.left) && this.isBalanced(node.right);
+    //true + ture =  ture
+  }
+
   // example usage of the call backs myRoot.levelOrder(myRoot.depth.bind(myRoot))
   // or this next one
   logTraversal(stuff) {
@@ -125,6 +143,7 @@ class Tree {
     }
     return levels;
   }
+
   preOrder(callback, node = this.root, nodes = []) {
     if (!callback) {
       throw new Error("Callback function is required");
@@ -137,6 +156,7 @@ class Tree {
     if (node.right) this.preOrder(callback, node.right, nodes);
     return nodes;
   }
+
   inOrder(callback, node = this.root, nodes = []) {
     if (!callback) {
       throw new Error("Callback function is required");
@@ -148,6 +168,7 @@ class Tree {
     if (node.right) this.inOrder(callback, node.right, nodes);
     return nodes;
   }
+
   postOrder(callback, node = this.root, nodes = []) {
     if (!callback) {
       throw new Error("Callback function is required");
@@ -159,27 +180,21 @@ class Tree {
     nodes.push(node.data);
     return nodes;
   }
+
   find(value, node = this.root) {
     if (value === node.data) return node;
     if (value < node.data && node.left) return this.find(value, node.left);
     if (value > node.data && node.right) return this.find(value, node.right);
     return null;
   }
+
   height(node) {
     if (node === null) return -1;
     const leftHeight = this.height(node.left);
     const rightHeight = this.height(node.right);
     return Math.max(leftHeight, rightHeight) + 1;
   }
-  isBalanced(node = this.root) {
-    if (node === null) return true;
-    const leftHeight = this.height(node.left);
-    const rightHeight = this.height(node.right);
-    if (Math.abs(leftHeight - rightHeight) > 1) {
-      return false;
-    }
-    return this.isBalanced(node.left) && this.isBalanced(node.right);
-  }
+
   depth(node, parent = this.root, depth = 0) {
     if (node.data === parent.data) return depth;
     if (node.data < parent.data)
@@ -200,13 +215,16 @@ function buildTree(array) {
 
   return root;
 }
+
 function prepArray(array) {
   const uniqueArray = Array.from(removeDuplicates(array));
   return sort(uniqueArray);
 }
+
 function removeDuplicates(array) {
   return new Set(array);
 }
+
 function sort(array) {
   if (array.length < 2) {
     return array;
@@ -217,6 +235,7 @@ function sort(array) {
     return merge(left, right);
   }
 }
+
 function merge(left, right) {
   let result = [];
   let i = 0;
@@ -232,6 +251,7 @@ function merge(left, right) {
   }
   return result.concat(left.slice(i)).concat(right.slice(j));
 }
+
 const prettyPrint = (node, prefix = "", isLeft = true) => {
   if (node === null) {
     return;
@@ -244,6 +264,26 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
     prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
   }
 };
+////////// helper function for testing purposes ////////////
+function testData() {
+  const array = [];
+  for (let i = 0; i < 10; i++) {
+    const num = Math.floor(Math.random() * 100);
+    array.push(num);
+  }
+  return array;
+}
+// testing
 
-const myRoot = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-prettyPrint(myRoot.root);
+//const myRoot = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
+//prettyPrint(myRoot.root);
+
+// more testing
+
+const test = new Tree(testData());
+prettyPrint(test.root);
+
+// all methods and functions working as intended
+// an optimization would be to the isBalanced method, currently it checks height and calls itself
+// this is n^2. it would be better to merge the two in one function, or rewrite the height func logic
+// insde isBalanced. but this structure is what the course instructor asked for
