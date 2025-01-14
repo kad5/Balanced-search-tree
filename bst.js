@@ -5,15 +5,17 @@ function createNode(data) {
     right: null,
   };
 }
-
 class Tree {
   constructor(array) {
     const sorted = prepArray(array);
     this.root = buildTree(sorted);
   }
-
   insert(value) {
     const newNode = createNode(value);
+    if (!this.root) {
+      this.root = newNode;
+      return;
+    }
     let node = this.root;
     while (node) {
       if (value === node.data) return;
@@ -26,12 +28,12 @@ class Tree {
       if (value > node.data) {
         if (!node.right) {
           node.right = newNode;
+          break;
         } else node = node.right;
       }
     }
     if (this.isBalanced() === false) this.rebalance();
   }
-
   deleteItem(value) {
     let parent = null;
     let node = this.root;
@@ -88,23 +90,85 @@ class Tree {
     }
     if (this.isBalanced() === false) this.rebalance();
   }
+  rebalance() {
+    //
+  }
+  // example usage of the call backs myRoot.levelOrder(myRoot.depth.bind(myRoot))
+  // or this next one
+  logTraversal(stuff) {
+    console.log(stuff);
+  }
 
-  rebalance() {}
+  levelOrder(callback) {
+    if (!callback) {
+      throw new Error("Callback function is required");
+    }
+    const levels = [];
+    let queue = this.root ? [this.root] : [];
+    while (queue.length > 0) {
+      const size = queue.length;
+      const level = [];
+      for (let i = 0; i < size; i++) {
+        const node = queue.shift();
+        callback(node);
+        level.push(node.data);
+        if (node.left) {
+          queue.push(node.left);
+        }
+        if (node.right) {
+          queue.push(node.right);
+        }
+      }
+      levels.push(level);
+    }
+    return levels;
+  }
+  preOrder(callback, node = this.root, nodes = []) {
+    if (!callback) {
+      throw new Error("Callback function is required");
+    }
+    if (node === null) return;
+    callback(node);
+    nodes.push(node.data);
+    if (node.left) this.preOrder(callback, node.left, nodes);
 
+    if (node.right) this.preOrder(callback, node.right, nodes);
+    return nodes;
+  }
+  inOrder(callback, node = this.root, nodes = []) {
+    if (!callback) {
+      throw new Error("Callback function is required");
+    }
+    if (node === null) return;
+    if (node.left) this.inOrder(callback, node.left, nodes);
+    callback(node);
+    nodes.push(node.data);
+    if (node.right) this.inOrder(callback, node.right, nodes);
+    return nodes;
+  }
+  postOrder(callback, node = this.root, nodes = []) {
+    if (!callback) {
+      throw new Error("Callback function is required");
+    }
+    if (node === null) return;
+    if (node.left) this.postOrder(callback, node.left, nodes);
+    if (node.right) this.postOrder(callback, node.right, nodes);
+    callback(node);
+    nodes.push(node.data);
+    return nodes;
+  }
   find(value, node = this.root) {
     if (value === node.data) return node;
     if (value < node.data && node.left) return this.find(value, node.left);
     if (value > node.data && node.right) return this.find(value, node.right);
     return null;
   }
-
   height(node) {
     if (node === null) return -1;
     const leftHeight = this.height(node.left);
     const rightHeight = this.height(node.right);
     return Math.max(leftHeight, rightHeight) + 1;
   }
-
   isBalanced(node = this.root) {
     if (node === null) return true;
     const leftHeight = this.height(node.left);
@@ -114,7 +178,6 @@ class Tree {
     }
     return this.isBalanced(node.left) && this.isBalanced(node.right);
   }
-
   depth(node, parent = this.root, depth = 0) {
     if (node.data === parent.data) return depth;
     if (node.data < parent.data)
@@ -135,16 +198,13 @@ function buildTree(array) {
 
   return root;
 }
-
 function prepArray(array) {
   const uniqueArray = Array.from(removeDuplicates(array));
   return sort(uniqueArray);
 }
-
 function removeDuplicates(array) {
   return new Set(array);
 }
-
 function sort(array) {
   if (array.length < 2) {
     return array;
@@ -155,7 +215,6 @@ function sort(array) {
     return merge(left, right);
   }
 }
-
 function merge(left, right) {
   let result = [];
   let i = 0;
@@ -171,7 +230,6 @@ function merge(left, right) {
   }
   return result.concat(left.slice(i)).concat(right.slice(j));
 }
-
 const prettyPrint = (node, prefix = "", isLeft = true) => {
   if (node === null) {
     return;
